@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ru"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Открывающая секция дня — ECOM Expo’26</title>
+<meta name="description" content="Ведущий секции:  Алексей Вайсберг  Доклады    Есть ли жизнь в собственном DTC при наличии маркетплейсов   Сергей Плешаков, директор по электронной коммерции Yves Rocher  1. Маркетп">
+<link rel="stylesheet" href="../assets/style.css?v=80337e80">
+</head><body>
+<header class="top">
+  <a class="brand" href="../index.html">ECOM Expo’26
+     <span>разбор выставки</span></a>
+  <nav><a href="../index.html">Разбор</a><a href="../program.html">Программа</a><a href="../exhibitors.html">Участники</a><a href="../people.html">Спикеры</a><a href="../articles.html">Статьи</a><a href="../feed.html">Розыгрыши</a><a href="../archive.html">Архив</a><a href="../method.html">Как собрано</a></nav>
+</header>
+<main>
+<p class="small"><a href="../program.html">← ко всей программе</a></p>
+<h1>Открывающая секция дня</h1>
+<p class="lead">25 июня, 09:50
+ · Зал 5 — БИЗНЕС-ПРОЦЕССЫ</p>
+<p><span class="tag">БИЗНЕС-ПРОЦЕССЫ</span></p>
+<p><b>Ведущий секции:</b> Алексей Вайсберг</p><h2>Доклады</h2><ul><li><b>Есть ли жизнь в собственном DTC при наличии маркетплейсов</b><br><span class="small">Сергей Плешаков, директор по электронной коммерции Yves Rocher</span><div class="small">1. Маркетплейсы начинают замещать ранее привычный бьюти-ритейл 2. Эволюция продаж на маркетплейсах 3. Трансформация контента благодаря маркетплейсам 4. Развитие контента: Rich-контент 5. Как не проиграть конкурентную борьбу с другими каналами и выдержать баланс 6.Почему необходимо развивать собственный канал DTC и маркетплейсы</div></li></ul>
+
+<h2>Участники</h2><div class='grid'><div class="card"><h3><a href="../person/aleksey-vaysberg.html">Алексей Вайсберг</a></h3><p class="meta">директор по развитию КСЭ</p></div><div class="card"><h3><a href="../person/sergey-pleshakov.html">Сергей Плешаков</a></h3><p class="meta">директор по электронной коммерции Yves Rocher</p></div></div>
+
+
+<h2>Первоисточник</h2><p><a href="https://expo.oborot.ru/#sec1839" rel="nofollow noopener" target="_blank">Это событие на официальном сайте</a></p>
+<p class="small muted"><a href="1838.html">← Открывающая секция дня</a> <a href="1842.html">1.3 Операционная деятельность на МП →</a></p>
+</main>
+<footer><p>Независимый разбор по открытым данным сайта организаторов и публичным Telegram-каналам участников. Это не официальный сайт ECOM Expo.</p></footer>
+
+<script>
+for (const box of document.querySelectorAll('.video[data-embed]')) {
+  const isVk = box.dataset.embed.includes('vk.com');
+  const canEmbed = !isVk || location.protocol === 'https:';
+  const open = () => {
+    if (!canEmbed && box.dataset.url) {
+      window.open(box.dataset.url, '_blank', 'noopener'); return;
+    }
+    const f = document.createElement('iframe');
+    f.allow = 'autoplay; encrypted-media; fullscreen; picture-in-picture';
+    f.allowFullscreen = true;
+    f.src = box.dataset.embed + (box.dataset.embed.includes('?') ? '&' : '?') + 'autoplay=1';
+    box.replaceChildren(f);
+    box.removeAttribute('role');
+    box.style.cursor = 'default';
+  };
+  box.addEventListener('click', open);
+  box.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); }
+  });
+  if (!canEmbed) { const n = document.getElementById('embed-note'); if (n) n.hidden = false; }
+}
+</script>
+</body></html>

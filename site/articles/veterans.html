@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="ru"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Три компании, которые не пропустили ни одного выпуска — ECOM Expo’26</title>
+<meta name="description" content="Sendsay, MANGO OFFICE и МойСклад стоят на ECOM Expo все десять доступных лет подряд. Вокруг них — узкий круг сервисов, составляющих несущую конструкцию рынка.">
+<link rel="stylesheet" href="../assets/style.css?v=80337e80">
+</head><body>
+<header class="top">
+  <a class="brand" href="../index.html">ECOM Expo’26
+     <span>разбор выставки</span></a>
+  <nav><a href="../index.html">Разбор</a><a href="../program.html">Программа</a><a href="../exhibitors.html">Участники</a><a href="../people.html">Спикеры</a><a href="../articles.html">Статьи</a><a href="../feed.html">Розыгрыши</a><a href="../archive.html">Архив</a><a href="../method.html">Как собрано</a></nav>
+</header>
+<main><h1>Три компании, которые не пропустили ни одного выпуска</h1>
+
+<p class="lead">На фоне того, что <a href="survival.html">64% участников приезжают
+однажды</a>, тем заметнее противоположный полюс: компании, которые держат стенд
+из года в год. Таких мало, и список почти не меняется.</p>
+
+<h2>Стопроцентная посещаемость</h2>
+
+<p>Ровно три компании присутствуют во всех десяти выпусках, попавших в открытый
+архив, — с 2015 по 2026 год:</p>
+
+<ul>
+<li><b>Sendsay</b> — платформа email- и мультиканальных рассылок;</li>
+<li><b>MANGO OFFICE</b> — облачная телефония и коммуникации;</li>
+<li><b>МойСклад</b> — учёт товаров и складские операции.</li>
+</ul>
+
+<p>Ещё девять компаний пропустили ровно один выпуск и стоят на девяти из десяти:
+СДЭК, Logsis, Курьер Сервис Экспресс, Retail Rocket Group, RetailCRM, Robokassa,
+inSales, Телфин и Mindbox.</p>
+
+<h2>Что общего у этой дюжины</h2>
+
+<p>Если разложить двенадцать «старожилов» по тому, что они продают, картина
+становится любопытной. Это не про товары и не про модные технологии — это
+инфраструктура, без которой интернет-магазин физически не работает:</p>
+
+<div class="wrap"><table>
+<tr><th>Что делает</th><th>Кто</th></tr>
+<tr><td>Доставка и курьерка</td><td>СДЭК, Logsis, Курьер Сервис Экспресс</td></tr>
+<tr><td>Связь с клиентом (рассылки, телефония, CRM)</td>
+    <td>Sendsay, MANGO OFFICE, Телфин, Mindbox, Retail Rocket Group, RetailCRM</td></tr>
+<tr><td>Учёт, витрина, платежи</td><td>МойСклад, inSales, Robokassa</td></tr>
+</table></div>
+
+<p>Ни одного маркетингового агентства. Ни одного консультанта по маркетплейсам.
+Ни одного ИИ-сервиса — при том что <a href="ai-2026.html">ИИ занимает шестую часть
+программы 2026 года</a>. Десятилетие на выставке держат те, чей продукт клиент
+однажды внедряет и потом не может выключить, не остановив продажи.</p>
+
+<h2>Почему это важно для посетителя</h2>
+
+<p>Постоянство стенда — косвенный, но честный сигнал. Компания, которая платит
+за площадь десять лет подряд, во-первых, все эти годы существует, во-вторых,
+считает выставку окупающимся каналом, то есть продолжает получать здесь клиентов.
+Для того, кто выбирает подрядчика на длинный контракт — учётную систему, телефонию,
+логистику, — это более полезная информация, чем содержание презентации на стенде.</p>
+
+<p>Обратное тоже верно, но осторожнее: дебютант не хуже, он просто моложе.
+44% участников 2026 года на выставке впервые, и среди них есть компании,
+которые через пять лет окажутся в этой же таблице.</p>
+
+<p><a href="../archive.html">Проверить любую компанию по годам →</a></p></main>
+<footer><p>Независимый разбор по открытым данным сайта организаторов и публичным Telegram-каналам участников. Это не официальный сайт ECOM Expo.</p></footer>
+
+<script>
+for (const box of document.querySelectorAll('.video[data-embed]')) {
+  const isVk = box.dataset.embed.includes('vk.com');
+  const canEmbed = !isVk || location.protocol === 'https:';
+  const open = () => {
+    if (!canEmbed && box.dataset.url) {
+      window.open(box.dataset.url, '_blank', 'noopener'); return;
+    }
+    const f = document.createElement('iframe');
+    f.allow = 'autoplay; encrypted-media; fullscreen; picture-in-picture';
+    f.allowFullscreen = true;
+    f.src = box.dataset.embed + (box.dataset.embed.includes('?') ? '&' : '?') + 'autoplay=1';
+    box.replaceChildren(f);
+    box.removeAttribute('role');
+    box.style.cursor = 'default';
+  };
+  box.addEventListener('click', open);
+  box.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); }
+  });
+  if (!canEmbed) { const n = document.getElementById('embed-note'); if (n) n.hidden = false; }
+}
+</script>
+</body></html>

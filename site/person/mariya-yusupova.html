@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ru"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Мария Юсупова — ECOM Expo’26</title>
+<meta name="description" content="Мария Юсупова — заместитель коммерческого директора КлаудПейментс">
+<link rel="stylesheet" href="../assets/style.css?v=80337e80">
+</head><body>
+<header class="top">
+  <a class="brand" href="../index.html">ECOM Expo’26
+     <span>разбор выставки</span></a>
+  <nav><a href="../index.html">Разбор</a><a href="../program.html">Программа</a><a href="../exhibitors.html">Участники</a><a href="../people.html">Спикеры</a><a href="../articles.html">Статьи</a><a href="../feed.html">Розыгрыши</a><a href="../archive.html">Архив</a><a href="../method.html">Как собрано</a></nav>
+</header>
+<main>
+<p class="small"><a href="../people.html">← ко всем участникам</a></p>
+<h1>Мария Юсупова</h1>
+<p class="lead">заместитель коммерческого директора КлаудПейментс</p>
+<p class="muted small">Соцсети не нашлись.</p>
+<h2>Выступления</h2><div class="ev"><time>25 июня</time><div><a href="../event/1852.html">Финансовые инструменты увеличения конверсии</a><div class="meta">Зал 5 — БИЗНЕС-ПРОЦЕССЫ</div></div></div>
+
+<p class="small muted">Ссылки найдены автоматически через поисковую выдачу —
+возможны однофамильцы.</p>
+</main>
+<footer><p>Независимый разбор по открытым данным сайта организаторов и публичным Telegram-каналам участников. Это не официальный сайт ECOM Expo.</p></footer>
+
+<script>
+for (const box of document.querySelectorAll('.video[data-embed]')) {
+  const isVk = box.dataset.embed.includes('vk.com');
+  const canEmbed = !isVk || location.protocol === 'https:';
+  const open = () => {
+    if (!canEmbed && box.dataset.url) {
+      window.open(box.dataset.url, '_blank', 'noopener'); return;
+    }
+    const f = document.createElement('iframe');
+    f.allow = 'autoplay; encrypted-media; fullscreen; picture-in-picture';
+    f.allowFullscreen = true;
+    f.src = box.dataset.embed + (box.dataset.embed.includes('?') ? '&' : '?') + 'autoplay=1';
+    box.replaceChildren(f);
+    box.removeAttribute('role');
+    box.style.cursor = 'default';
+  };
+  box.addEventListener('click', open);
+  box.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); }
+  });
+  if (!canEmbed) { const n = document.getElementById('embed-note'); if (n) n.hidden = false; }
+}
+</script>
+</body></html>
