@@ -1,5 +1,11 @@
 [
  {
+  "file": "book.html",
+  "nav": "Книга",
+  "title": "Ecom 2026 — книга-обзор выставки",
+  "description": "Полный разбор программы ECOM Expo’26 в HTML и PDF."
+ },
+ {
   "file": "channels.html",
   "nav": "Каналы",
   "title": "Telegram-каналы участников",

@@ -451,7 +451,7 @@ def all_participations(exhibitors):
     return rows
 
 
-def build_meta(exhibitors, events, people, feed, giveaways, channels):
+def build_meta(exhibitors, events, people, feed, giveaways, channels, book=None):
     parts = all_participations(exhibitors)
     topics = topics_by_domain()
 
@@ -535,6 +535,9 @@ def build_meta(exhibitors, events, people, feed, giveaways, channels):
             ["people", "Спикеры", "%d выступающих с биографиями и темами" % len(people)],
             ["feed", "Лента каналов", "Последние посты %d каналов участников по дням" % channels],
             ["articles", "Разборы", "Выставка в цифрах: кто держится десять лет, а кого вымыло"],
+        ] + ([["book.html", "Книга «Ecom 2026»",
+               "%d глав по всей программе, %d докладов — читать онлайн или скачать PDF"
+               % (book["chapters"], book["talks"])]] if book else []) + [
         ],
         "events_page": "program.html",
         "events_nav": "Программа",
@@ -550,6 +553,7 @@ def build_meta(exhibitors, events, people, feed, giveaways, channels):
         "articles_lead": "Что видно в данных за одиннадцать лет выставки.",
         "exhibitor_groups": [g for g, _ in group_rows],
         "index_title": "ECOM Expo’26 в цифрах",
+        "assets": ["book/ecom-2026.html", "book/ecom-2026.pdf"] if book else [],
         "body": years_body,
         "telegram_channels": with_tg,
     }
@@ -721,6 +725,114 @@ def build_channels_page():
     return len(live)
 
 
+def plural(n, one, few, many):
+    """33 главы, 21 глава, 148 докладов — без этого в лиде «33 глав»."""
+    n10, n100 = n % 10, n % 100
+    if n10 == 1 and n100 != 11:
+        return "%d %s" % (n, one)
+    if 2 <= n10 <= 4 and not 12 <= n100 <= 14:
+        return "%d %s" % (n, few)
+    return "%d %s" % (n, many)
+
+
+def build_book_page():
+    """Страница книги: аннотация, состав частей и ссылки на онлайн-версию и PDF.
+
+    Саму книгу не встраиваем в шаблон сайта: у неё своя печатная вёрстка,
+    и в assets она лежит самостоятельным файлом, который открывается как есть.
+    Возвращает None, если книга ещё не собрана (build_book.py не запускали).
+    """
+    html_path = os.path.join(HERE, "book", "ecom-2026.html")
+    pdf_path = os.path.join(HERE, "book", "ecom-2026.pdf")
+    if not os.path.exists(html_path):
+        return None
+
+    chapters = load_json("data/raw/book_chapters.json", {}) or {}
+    talks = sum(c.get("talks", 0) for c in chapters.values())
+    pages = ""
+    if os.path.exists(pdf_path):
+        with open(pdf_path, "rb") as f:
+            blob = f.read()
+        pages = len(re.findall(rb"/Type\s*/Page[^s]", blob))
+        size_mb = len(blob) / 1048576
+
+    parts = [
+        ("Часть I. О чём эта книга", "Что за выставка, как устроен разбор и откуда данные."),
+        ("Часть II. Выставка в цифрах",
+         "Масштаб события, рубрики стендов, темы докладов и одиннадцать лет истории участников."),
+        ("Часть III. Маркетплейсы",
+         "Восемь секций: контент карточки, продвижение и аналитика селлера, "
+         "операционка, контрактное производство, ИИ на службе селлера."),
+        ("Часть IV. Маркетинг и продажи",
+         "Одиннадцать секций: инфлюенс-маркетинг, лояльность и повторные продажи, "
+         "трафик и воронка, конверсия и средний чек, ИИ в маркетинге, бренд и СТМ."),
+        ("Часть V. Логистика, платежи и операции",
+         "Семь секций: логистическая эффективность, последняя миля, склад, "
+         "платежи и кассы, финансовые инструменты, зарубежные поставщики."),
+        ("Часть VI. ИТ и разработка",
+         "Пять секций: интеграции и бэкенд, внешняя разработка и поддержка, "
+         "автоматизация логистики."),
+        ("Часть VII. Право, налоги и кадры",
+         "Две секции совмещённого потока: споры с площадками, интеллектуальная "
+         "собственность, налоги, бухгалтерия и наём."),
+        ("Приложение", "Справочник 205 участников по рубрикам: стенд, профиль, "
+                       "сколько раз компания была на выставке."),
+    ]
+    rows = "".join('<div class="card"><h3>%s</h3><p class="small">%s</p></div>'
+                   % (esc(t), esc(d)) for t, d in parts)
+
+    size_note = (" Объём — %s." % plural(pages, "страница", "страницы", "страниц")) if pages else ""
+
+    html = """<style>
+/* Класса .btn в теме сайта нет, а ссылки на книгу должны читаться как действия.
+   Цвета берём из переменных темы, чтобы кнопки работали и в тёмном режиме. */
+.book-actions { display: flex; gap: 10px; flex-wrap: wrap; margin: 18px 0 26px; }
+.book-actions a { display: inline-block; padding: 10px 18px; border-radius: 8px;
+  text-decoration: none; border: 1px solid var(--acc); font-weight: 600; }
+.book-actions .primary { background: var(--acc); color: var(--bg); }
+.book-actions .secondary { color: var(--acc); background: transparent; }
+.book-actions a:hover { opacity: .85; }
+</style>
+
+<h1>Ecom 2026 — книга-обзор выставки</h1>
+
+<p class="lead">Полный разбор программы ECOM Expo’26: %s по секциям,
+%s с тезисами спикеров, голоса участников из их Telegram-каналов
+и отраслевой контекст из поисковой выдачи.%s</p>
+
+<div class="book-actions">
+  <a class="primary" href="assets/ecom-2026.html">Читать онлайн</a>
+  <a class="secondary" href="assets/ecom-2026.pdf">Скачать PDF%s</a>
+</div>
+
+<h2>Из чего состоит</h2>
+<div class="grid">%s</div>
+
+<h2>Как она сделана</h2>
+
+<p>Введение, часть «Выставка в цифрах», вводные к частям и заключение написаны
+вручную. Главы по секциям сгенерированы языковой моделью строго по фактуре:
+ей передавались только реальные доклады с тезисами, посты каналов компаний-участников
+за 2026 год и материалы поисковой выдачи, с запретом добавлять что-либо от себя.
+Все упомянутые имена сверены с программой и с собранными постами.</p>
+
+<p>Контакты участников в книгу не вошли намеренно — по той же причине,
+по которой их нет на сайте: <a href="method.html">о методике</a>.</p>
+
+<p class="small muted">Программа зафиксирована на дату сбора; организаторы правят
+её до последнего дня. Актуальное расписание — в разделе
+<a href="program.html">«Программа»</a>.</p>
+""" % (plural(len(chapters), "глава", "главы", "глав"),
+       plural(talks, "доклад", "доклада", "докладов"), size_note,
+       (" · %.1f МБ" % size_mb) if pages else "", rows)
+
+    os.makedirs(CONTENT, exist_ok=True)
+    with open(os.path.join(CONTENT, "book.html"), "w", encoding="utf-8") as f:
+        f.write(html)
+    print("  content/book.html    %d глав, %s страниц" % (len(chapters), pages or "?"))
+    return {"chapters": len(chapters), "talks": talks, "pages": pages}
+
+
 def build_giveaways_page(giveaways):
     """Розыгрыши и приглашения на стенд — раньше были нативной лентой,
     теперь лента занята постами каналов, поэтому это авторская страница."""
@@ -775,13 +887,19 @@ def main():
     giveaways = build_giveaways()
     build_giveaways_page(giveaways)
     channels = build_channels_page()
+    book = build_book_page()
 
     build_archive_page(exhibitors)
 
-    meta = build_meta(exhibitors, events, people, feed, giveaways, channels)
+    meta = build_meta(exhibitors, events, people, feed, giveaways, channels, book)
     dump("meta.json", meta)
 
-    dump("pages.json", [
+    book_page = ([{"file": "book.html", "nav": "Книга",
+                   "title": "Ecom 2026 — книга-обзор выставки",
+                   "description": "Полный разбор программы ECOM Expo’26 в HTML и PDF."}]
+                 if book else [])
+
+    dump("pages.json", book_page + [
         {"file": "channels.html", "nav": "Каналы",
          "title": "Telegram-каналы участников",
          "description": "Каналы компаний-участников ECOM Expo’26 с их постами."},
