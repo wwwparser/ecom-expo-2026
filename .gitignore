@@ -11,20 +11,20 @@
 # уходит спамерам и индексируется.
 contacts_out/
 archive_contacts_out/
-*.xlsx
-archive_participants.jsonl
-archive_unique_sites.txt
-tg_results*.jsonl
-tg_channels.json
-tg_memo.txt
+/*.xlsx
+/archive_participants.jsonl
+/archive_unique_sites.txt
+/tg_results*.jsonl
+/tg_channels.json
+/tg_memo.txt
 export_marketguru_gifts/
 
 # Промежуточное и тяжёлое
 data/raw/home.html
-page.html
-archive*.html
-tg_report*.html
-*.log
+/page.html
+/archive*.html
+/tg_report*.html
+/*.log
 *.bak
 __pycache__/
 
