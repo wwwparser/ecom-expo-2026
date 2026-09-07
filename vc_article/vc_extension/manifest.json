@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "ECOM Expo → vc.ru вставка статьи",
+  "version": "1.9",
+  "description": "Вставка статьи (текст + графики) в редактор Editor.js на vc.ru через нативный paste, с самодиагностикой.",
+  "content_scripts": [
+    {
+      "matches": [
+        "https://vc.ru/*",
+        "https://*.vc.ru/*"
+      ],
+      "js": [
+        "article_data.js",
+        "content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}

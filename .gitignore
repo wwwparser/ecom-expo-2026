@@ -1,0 +1,34 @@
+# Ключи и сессии
+.env
+*.session
+*.session-journal
+
+# Собранный сайт (живёт в ветке gh-pages)
+/site/
+
+# Сырые данные с почтами и телефонами компаний — на сайт они не идут
+# и в публичный репозиторий тоже: открытый список рабочих почт мгновенно
+# уходит спамерам и индексируется.
+contacts_out/
+archive_contacts_out/
+*.xlsx
+archive_participants.jsonl
+archive_unique_sites.txt
+tg_results*.jsonl
+tg_channels.json
+tg_memo.txt
+export_marketguru_gifts/
+
+# Промежуточное и тяжёлое
+data/raw/home.html
+page.html
+archive*.html
+tg_report*.html
+*.log
+*.bak
+__pycache__/
+
+# Личный телефон и hash авторизации Telegram
+tg_login_state.json
+*.pyc
+data/raw/
