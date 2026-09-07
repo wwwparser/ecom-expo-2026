@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ru"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Разборы — ECOM Expo’26</title>
+<meta name="description" content="Разборы по темам.">
+<link rel="stylesheet" href="assets/style.css?v=80337e80">
+</head><body>
+<header class="top">
+  <a class="brand" href="index.html">ECOM Expo’26
+     <span>разбор выставки</span></a>
+  <nav><a href="index.html">Разбор</a><a href="program.html">Программа</a><a href="exhibitors.html">Участники</a><a href="people.html">Спикеры</a><a href="articles.html">Статьи</a><a href="feed.html">Розыгрыши</a><a href="archive.html">Архив</a><a href="method.html">Как собрано</a></nav>
+</header>
+<main>
+<h1>Разборы</h1>
+<p class="lead">Что видно в данных за одиннадцать лет выставки.</p>
+<div class="grid"><div class="card"><h3><a href="articles/ai-2026.html">ИИ занял шестую часть программы</a></h3><p class="meta"><span class="tag">Тренды</span></p><p class="small">Из 182 докладов 2026 года 30 так или иначе про искусственный интеллект — больше, чем про маркетплейсы. Разбираем, о чём именно говорят.</p></div><div class="card"><h3><a href="articles/survival.html">Две трети участников приезжают один раз</a></h3><p class="meta"><span class="tag">Индустрия</span></p><p class="small">За десять выпусков через ECOM Expo прошли 1227 компаний. 787 из них были на выставке ровно однажды — и больше не возвращались.</p></div><div class="card"><h3><a href="articles/telegram.html">Что участники обещают в своих Telegram-каналах</a></h3><p class="meta"><span class="tag">Практика</span></p><p class="small">Я прочитал каналы 590 компаний-участников. В 42 постах разыгрывают призы, в 68 зовут на конкретный стенд — и почти ничего из этого нет на официальном сайте.</p></div><div class="card"><h3><a href="articles/veterans.html">Три компании, которые не пропустили ни одного выпуска</a></h3><p class="meta"><span class="tag">Индустрия</span></p><p class="small">Sendsay, MANGO OFFICE и МойСклад стоят на ECOM Expo все десять доступных лет подряд. Вокруг них — узкий круг сервисов, составляющих несущую конструкцию рынка.</p></div></div>
+</main>
+<footer><p>Независимый разбор по открытым данным сайта организаторов и публичным Telegram-каналам участников. Это не официальный сайт ECOM Expo.</p></footer>
+
+<script>
+for (const box of document.querySelectorAll('.video[data-embed]')) {
+  const isVk = box.dataset.embed.includes('vk.com');
+  const canEmbed = !isVk || location.protocol === 'https:';
+  const open = () => {
+    if (!canEmbed && box.dataset.url) {
+      window.open(box.dataset.url, '_blank', 'noopener'); return;
+    }
+    const f = document.createElement('iframe');
+    f.allow = 'autoplay; encrypted-media; fullscreen; picture-in-picture';
+    f.allowFullscreen = true;
+    f.src = box.dataset.embed + (box.dataset.embed.includes('?') ? '&' : '?') + 'autoplay=1';
+    box.replaceChildren(f);
+    box.removeAttribute('role');
+    box.style.cursor = 'default';
+  };
+  box.addEventListener('click', open);
+  box.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); }
+  });
+  if (!canEmbed) { const n = document.getElementById('embed-note'); if (n) n.hidden = false; }
+}
+</script>
+</body></html>
