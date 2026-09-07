@@ -91,3 +91,41 @@ python ~/.claude/skills/expo-site/scripts/publish.py --repo ecom-expo-2026
 - `enrich_speakers.py` — внешние ссылки спикеров через выдачу, с защитой от однофамильцев
 - `expo_adapter.py` — сведение всех источников в контракт навыка `expo-site`
 - `content/` — авторские статьи и страницы, `data/site/` — данные для генератора
+
+## Книга «Ecom 2026»
+
+`book/ecom-2026.html` и `book/ecom-2026.pdf` — обзор всей программы выставки:
+96 страниц, 33 главы по секциям, 148 докладов. Введение, часть «Выставка
+в цифрах», вводные к частям и заключение написаны вручную; главы по секциям
+генерирует бесплатная модель OpenRouter строго по фактуре (доклады с тезисами,
+посты каналов участников за 2026 год, материалы XMLRiver).
+
+```powershell
+python collect_channel_history.py   # посты каналов участников за 2026 (10 422 поста)
+python build_book.py                # главы -> HTML -> PDF (Playwright/Chromium)
+python build_book.py --limit 3      # пилот
+python build_book.py --html-only    # без PDF
+```
+
+Кэш глав — `data/raw/book_chapters.json`: повторный запуск не перегенерирует
+уже готовые главы. Кэш выдачи — `data/raw/book_serp.json`, повторных платных
+запросов нет.
+
+## Лента и каналы участников
+
+```powershell
+python collect_channel_posts.py     # последние 10 постов каждого канала (для ленты)
+python expo_adapter.py              # feed.json + страницы каналов и розыгрышей
+```
+
+Из 152 телеграм-адресов участников публичная лента есть у 98: остальные —
+личные аккаунты менеджеров и закрытые каналы.
+
+## Контакты участников
+
+```powershell
+python ~/.claude/skills/contact-scraper/scripts/scrape_contacts.py     --excel exhibitors_ecom_expo_2026.xlsx --site-col Сайт --name-col Компания     --outdir contacts_2026 --resume
+```
+
+`contacts_2026/` — 203 компании, 156 с email, 123 с Telegram, 45 с MAX:
+xlsx, кликабельный html и jsonl. Папка в `.gitignore` и на сайт не идёт.

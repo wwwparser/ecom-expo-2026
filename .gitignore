@@ -32,3 +32,7 @@ __pycache__/
 tg_login_state.json
 *.pyc
 data/raw/
+
+# Свежий сбор контактов: почты и телефоны, наружу не идут
+contacts_2026/
+book/
