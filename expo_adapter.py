@@ -365,6 +365,35 @@ def scrub(text):
 
 
 def build_feed():
+    """Лента последних постов Telegram-каналов участников, по дням.
+
+    Источник — data/raw/channel_posts.json (collect_channel_posts.py): у постов
+    есть дата со временем и просмотры, поэтому генератор раскладывает их по дням.
+    Группа поста — рубрика компании, чтобы ленту можно было фильтровать.
+    """
+    data = load_json("data/raw/channel_posts.json", {}) or {}
+    posts = []
+    for rec in data.values():
+        stand = ", ".join(rec.get("stands") or [])
+        for p in rec.get("posts") or []:
+            text = scrub(p.get("text") or "").strip()
+            if not text:
+                continue  # посты из одних картинок в текстовой ленте бесполезны
+            posts.append({
+                "date": p.get("datetime") or "",
+                "text": text[:1500],
+                "views": p.get("views"),
+                "url": p.get("url") or "",
+                "channel": rec.get("company") or rec["username"],
+                "channel_url": "https://t.me/%s" % rec["username"],
+                "author": ("стенд %s" % stand) if stand else "",
+                "group": rec.get("group") or "",
+            })
+    posts.sort(key=lambda p: p["date"], reverse=True)
+    return posts
+
+
+def build_giveaways():
     """Посты участников: приглашения на стенд и розыгрыши в дни выставки."""
     posts = []
     for r in jsonl("tg_results.jsonl"):
@@ -422,7 +451,7 @@ def all_participations(exhibitors):
     return rows
 
 
-def build_meta(exhibitors, events, people, feed):
+def build_meta(exhibitors, events, people, feed, giveaways, channels):
     parts = all_participations(exhibitors)
     topics = topics_by_domain()
 
@@ -466,7 +495,7 @@ def build_meta(exhibitors, events, people, feed):
 
     hall_rows = Counter(e["kind"] for e in events if e["kind"]).most_common()
 
-    give = sum(1 for x in exhibitors if x.get("giveaway"))
+    give = sum(1 for p in giveaways if p["group"] == "Розыгрыши и мерч")
     with_tg = sum(1 for x in exhibitors if x.get("telegram"))
 
     return {
@@ -487,7 +516,8 @@ def build_meta(exhibitors, events, people, feed):
             {"value": len(people), "label": "спикеров", "href": "people"},
             {"value": len(by_company), "label": "компаний с 2015 года", "href": "archive"},
             {"value": len(parts), "label": "участий за 10 выпусков", "href": "archive"},
-            {"value": give, "label": "розыгрышей на стендах", "href": "feed"},
+            {"value": channels, "label": "каналов участников", "href": "channels"},
+            {"value": len(feed), "label": "постов в ленте", "href": "feed"},
         ],
         "breakdowns": [
             {"title": "Участники 2026 по рубрикам", "anchor": "groups",
@@ -503,7 +533,7 @@ def build_meta(exhibitors, events, people, feed):
             ["events", "Программа двух дней", "%d секций в 6 потоках, фильтры по дню и залу" % len(events)],
             ["exhibitors", "Участники", "%d компаний со стендами, сайтами и соцсетями" % len(exhibitors)],
             ["people", "Спикеры", "%d выступающих с биографиями и темами" % len(people)],
-            ["feed", "Розыгрыши и приглашения", "Что участники писали у себя в Telegram"],
+            ["feed", "Лента каналов", "Последние посты %d каналов участников по дням" % channels],
             ["articles", "Разборы", "Выставка в цифрах: кто держится десять лет, а кого вымыло"],
         ],
         "events_page": "program.html",
@@ -513,8 +543,8 @@ def build_meta(exhibitors, events, people, feed):
         "exhibitors_title": "Участники выставки",
         "people_nav": "Спикеры",
         "people_title": "Спикеры",
-        "feed_nav": "Розыгрыши",
-        "feed_title": "Розыгрыши и приглашения из Telegram",
+        "feed_nav": "Лента",
+        "feed_title": "Лента каналов участников",
         "articles_nav": "Разборы",
         "articles_title": "Разборы",
         "articles_lead": "Что видно в данных за одиннадцать лет выставки.",
@@ -614,6 +644,120 @@ def build_archive_page(exhibitors):
     return len(by_company), len(parts)
 
 
+def esc(s):
+    return (str(s or "").replace("&", "&amp;").replace("<", "&lt;")
+            .replace(">", "&gt;").replace('"', "&quot;"))
+
+
+CHANNELS_PAGE = """<h1>Telegram-каналы участников</h1>
+<p class="lead">%(with_posts)s каналов компаний, стоящих на ECOM Expo’26: последние
+посты, рубрика и номер стенда. Свежие сообщения всех каналов собраны
+в <a href="feed.html">ленте по дням</a>.</p>
+<div class="filters">%(select)s<input id="cq" placeholder="Поиск по компании или каналу…"></div>
+<p class="muted small" id="cc"></p>
+<div class="wrap"><table id="ctable">
+<tr><th>Компания</th><th>Канал</th><th>Стенд</th><th>Постов</th><th>Последний пост</th></tr>
+%(rows)s
+</table></div>
+<p class="small muted">Ещё у %(no_preview)s компаний в списке участников указан
+телеграм-адрес, но публичной ленты по нему нет: это личные аккаунты менеджеров
+или закрытые каналы — их посты недоступны и в подборку не попали.</p>
+<script>
+(function () {
+  var q = document.getElementById('cq'), sel = document.getElementById('cg'),
+      rows = [].slice.call(document.querySelectorAll('#ctable tr[data-s]')),
+      out = document.getElementById('cc');
+  function apply() {
+    var text = q.value.trim().toLowerCase(), g = sel.value, n = 0;
+    rows.forEach(function (r) {
+      var ok = (!text || r.dataset.s.indexOf(text) > -1) && (!g || r.dataset.g === g);
+      r.hidden = !ok;
+      if (ok) n++;
+    });
+    out.textContent = n + ' из ' + rows.length;
+  }
+  q.addEventListener('input', apply);
+  sel.addEventListener('change', apply);
+  apply();
+})();
+</script>"""
+
+
+def build_channels_page():
+    """Каталог каналов участников — отдельная страница (генератор такой не умеет)."""
+    data = load_json("data/raw/channel_posts.json", {}) or {}
+    live = [r for r in data.values() if r.get("posts")]
+    live.sort(key=lambda r: (r.get("company") or "").lower())
+
+    rows, groups = [], set()
+    for r in live:
+        posts = r["posts"]
+        last = max((p.get("datetime") or "")[:10] for p in posts)
+        group = r.get("group") or ""
+        groups.add(group)
+        rows.append(
+            '<tr data-s="%s" data-g="%s"><td><b>%s</b><br>'
+            '<span class="small muted">%s</span></td>'
+            '<td><a href="https://t.me/%s" rel="nofollow noopener" target="_blank">@%s</a></td>'
+            '<td class="small">%s</td><td>%d</td><td class="small">%s</td></tr>'
+            % (esc((r.get("company", "") + " " + r["username"]).lower()), esc(group),
+               esc(r.get("company", "")), esc(group), esc(r["username"]), esc(r["username"]),
+               esc(", ".join(r.get("stands") or []) or "—"), len(posts), esc(last)))
+
+    select = ('<select id="cg"><option value="">Все рубрики</option>%s</select>'
+              % "".join('<option value="%s">%s</option>' % (esc(g), esc(g))
+                        for g in sorted(x for x in groups if x)))
+
+    html = CHANNELS_PAGE % {
+        "with_posts": len(live),
+        "no_preview": len(data) - len(live),
+        "select": select,
+        "rows": "".join(rows),
+    }
+    os.makedirs(CONTENT, exist_ok=True)
+    with open(os.path.join(CONTENT, "channels.html"), "w", encoding="utf-8") as f:
+        f.write(html)
+    print("  content/channels.html %d каналов" % len(live))
+    return len(live)
+
+
+def build_giveaways_page(giveaways):
+    """Розыгрыши и приглашения на стенд — раньше были нативной лентой,
+    теперь лента занята постами каналов, поэтому это авторская страница."""
+    by_group = defaultdict(list)
+    for p in giveaways:
+        by_group[p["group"]].append(p)
+
+    blocks = []
+    for group in ("Розыгрыши и мерч", "Приглашения на стенд"):
+        items = by_group.get(group) or []
+        if not items:
+            continue
+        cards = []
+        for p in items:
+            text = p["text"].strip()
+            cards.append(
+                '<div class="card"><h3><a href="%s" rel="nofollow noopener" '
+                'target="_blank">%s</a></h3><p class="small">%s</p></div>'
+                % (esc(p["url"]), esc(p["channel"]),
+                   esc(text[:420] + ("…" if len(text) > 420 else ""))))
+        blocks.append('<h2>%s <span class="muted small">— %d</span></h2>'
+                      '<div class="grid">%s</div>' % (esc(group), len(items), "".join(cards)))
+
+    html = ("""<h1>Розыгрыши и приглашения на стенды</h1>
+<p class="lead">Что компании обещали посетителям в своих Telegram-каналах перед
+выставкой: призы, мерч и приглашения с номерами стендов. Ссылка ведёт
+на исходный пост — условия и сроки стоит проверять там.</p>
+%s
+<p class="small muted">Собрано из публичных каналов участников, разметка постов
+автоматическая. Часть акций к моменту чтения уже завершилась.</p>"""
+            % "".join(blocks))
+
+    with open(os.path.join(CONTENT, "giveaways.html"), "w", encoding="utf-8") as f:
+        f.write(html)
+    print("  content/giveaways.html %d записей" % len(giveaways))
+
+
 def main():
     os.makedirs(SITE, exist_ok=True)
     print("собираю data/site/…")
@@ -628,12 +772,22 @@ def main():
     feed = build_feed()
     dump("feed.json", feed)
 
+    giveaways = build_giveaways()
+    build_giveaways_page(giveaways)
+    channels = build_channels_page()
+
     build_archive_page(exhibitors)
 
-    meta = build_meta(exhibitors, events, people, feed)
+    meta = build_meta(exhibitors, events, people, feed, giveaways, channels)
     dump("meta.json", meta)
 
     dump("pages.json", [
+        {"file": "channels.html", "nav": "Каналы",
+         "title": "Telegram-каналы участников",
+         "description": "Каналы компаний-участников ECOM Expo’26 с их постами."},
+        {"file": "giveaways.html", "nav": "Розыгрыши",
+         "title": "Розыгрыши и приглашения на стенды",
+         "description": "Что участники обещали посетителям в своих Telegram-каналах."},
         {"file": "archive.html", "nav": "Архив",
          "title": "Архив выставки 2015–2026",
          "description": "Все компании, участвовавшие в ECOM Expo с 2015 года."},

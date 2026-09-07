@@ -1,5 +1,17 @@
 [
  {
+  "file": "channels.html",
+  "nav": "Каналы",
+  "title": "Telegram-каналы участников",
+  "description": "Каналы компаний-участников ECOM Expo’26 с их постами."
+ },
+ {
+  "file": "giveaways.html",
+  "nav": "Розыгрыши",
+  "title": "Розыгрыши и приглашения на стенды",
+  "description": "Что участники обещали посетителям в своих Telegram-каналах."
+ },
+ {
   "file": "archive.html",
   "nav": "Архив",
   "title": "Архив выставки 2015–2026",
